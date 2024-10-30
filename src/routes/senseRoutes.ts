@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { SenseController } from '../controllers/senseController';
+import { SenseController } from '../controllers/SenseController';
 
 const senseRoutes = Router();
 const senseController = new SenseController();
 
-senseRoutes.get('/', senseController.show.bind(senseController));
+senseRoutes.post('/', senseController.byEncodedUrl.bind(senseController));
+senseRoutes.get('/', senseController.view.bind(senseController));
 
 export { senseRoutes };
