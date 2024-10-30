@@ -12,4 +12,8 @@ export class ControllerUtils {
       error: message
     };
   }
+
+  static isUndefined(value: any) {
+    return typeof value === 'undefined';
+  }
 }
