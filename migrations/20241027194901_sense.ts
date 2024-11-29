@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     schema.decimal('distance', 8, 4).notNullable().comment('Leitura do sensor de distância');
     schema.decimal('light', 8, 4).notNullable().comment('Leitura do fotorresistor');
     schema.boolean('is_available').notNullable().comment('Indica se a vaga está sendo ocupada ou não conforme a lógica embarcada');
+    schema.string('parking_slot').notNullable().comment('indica qual a vaga que está sendo interagida');
     schema.timestamp('created_at').defaultTo(knex.fn.now()).comment('Momento que ocorreu a gravação');
   });
 }

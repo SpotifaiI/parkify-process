@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { SenseDomain } from '../domain/SenseDomain';
 import { SenseBody, SenseData } from '../types/senseTypes';
 import { ControllerUtils } from '../utils/ControllerUtils';
+import { presentation } from '../config/api';
 
 export class SenseController {
   private sense: SenseDomain;
@@ -11,22 +12,24 @@ export class SenseController {
   }
 
   public async byEncodedUrl(req: Request, res: Response): Promise<void> {
-    const { distance, is_available, light }: SenseBody = req.body;
+    const { distance, is_available, light, parking_slot }: SenseBody = req.body;
 
     try {
       const dataIsComplete =
         !ControllerUtils.isUndefined(distance) &&
         !ControllerUtils.isUndefined(is_available) &&
-        !ControllerUtils.isUndefined(light);
+        !ControllerUtils.isUndefined(light) &&
+        !ControllerUtils.isUndefined(parking_slot);
 
       if (!dataIsComplete) {
-        throw new Error('Parâmetros de [distance, is_available, light] são obrigatórios.');
+        throw new Error('Parâmetros de [distance, is_available, light, parking_slot] são obrigatórios.');
       }
 
       const saveData: SenseData = {
         distance: this.sense.toFloat(distance),
         light: this.sense.toFloat(light),
-        is_available: this.sense.toAvailable(is_available)
+        is_available: this.sense.toAvailable(is_available),
+        parking_slot: (parking_slot || 'N/D').toString()
       };
 
       const saveResult = await this.sense.add(saveData);
@@ -35,6 +38,7 @@ export class SenseController {
         throw new Error('Ocorreu um erro e não foi possível salvar a leitura.');
       }
 
+      await presentation.post('/refresh', { near_free_slot: parking_slot });
       res.status(200).send({ ok: true, sense: saveResult });
     } catch (error) {
       let message = error as string;

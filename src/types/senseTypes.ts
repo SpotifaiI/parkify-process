@@ -2,12 +2,14 @@ export type SenseBody = {
   distance?: string;
   light?: string;
   is_available?: string;
+  parking_slot?: string;
 };
 
 export type SenseData = {
   distance: number;
   light: number;
   is_available: boolean;
+  parking_slot: string;
 };
 
 export type SenseRow = {
