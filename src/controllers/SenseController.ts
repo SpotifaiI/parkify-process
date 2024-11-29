@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { SenseDomain } from '../domain/SenseDomain';
 import { SenseBody, SenseData } from '../types/senseTypes';
 import { ControllerUtils } from '../utils/ControllerUtils';
+import { presentation } from '../config/api';
 
 export class SenseController {
   private sense: SenseDomain;
@@ -37,6 +38,7 @@ export class SenseController {
         throw new Error('Ocorreu um erro e não foi possível salvar a leitura.');
       }
 
+      await presentation.post('/refresh', { near_free_slot: parking_slot });
       res.status(200).send({ ok: true, sense: saveResult });
     } catch (error) {
       let message = error as string;
