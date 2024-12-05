@@ -22,6 +22,8 @@ export class ControllerUtils {
   }
 
   static convertMinutesToMMSS(minutes: number) {
+    if (isNaN(minutes)) return '';
+
     // Convert the decimal minutes to total seconds
     let totalSeconds = Math.floor(minutes * 60);
 
