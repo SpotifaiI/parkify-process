@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
+import { presentation } from '../config/api';
 import { SenseDomain } from '../domain/SenseDomain';
 import { SenseBody, SenseData } from '../types/senseTypes';
 import { ControllerUtils } from '../utils/ControllerUtils';
-import { presentation } from '../config/api';
 
 export class SenseController {
   private sense: SenseDomain;
@@ -38,7 +38,44 @@ export class SenseController {
         throw new Error('Ocorreu um erro e não foi possível salvar a leitura.');
       }
 
-      await presentation.post('/refresh', { near_free_slot: parking_slot });
+      const recentFilledSlot = await this.sense.model().recentFilledSlot();
+      const recentFreeSlot = await this.sense.model().recentFreeSlot();
+      const busySlot = await this.sense.model().busySlot();
+      const chillSlot = await this.sense.model().chillSlot();
+      const timeFreeToday = await this.sense.model().timeFreeToday();
+      const timeFilledToday = await this.sense.model().timeFilledToday();
+      const recentFree = await this.sense.model().recentFree();
+      const recentFilled = await this.sense.model().recentFilled();
+
+      const recentFreeDistinct: string[] = [];
+      const recentFilledDistinct: string [] = [];
+
+      for (let free of recentFree) {
+        if (!recentFreeDistinct.includes(free.parking_slot || '')) {
+          recentFreeDistinct.push(free.parking_slot || '');
+        }
+      }
+      for (let filled of recentFilled) {
+        if (!recentFilledDistinct.includes(filled.parking_slot || '')) {
+          recentFilledDistinct.push(filled.parking_slot || '');
+        }
+      }
+
+      const content = {
+        recentFilledSlot: recentFilledSlot?.parking_slot || '',
+        recentFreeSlot: recentFreeSlot?.parking_slot || '',
+        busySlot: busySlot.parking_slot || '',
+        chillSlot: chillSlot.parking_slot || '',
+        timeFreeToday,
+        timeFilledToday,
+        recentFree: recentFreeDistinct,
+        recentFilled: recentFilledDistinct
+      };
+
+      console.log(content);
+
+      await presentation.post('/refresh', content);
+
       res.status(200).send({ ok: true, sense: saveResult });
     } catch (error) {
       let message = error as string;

@@ -27,3 +27,11 @@ export type SerializedSenseRow = {
   is_available: boolean;
   created_at: string;
 };
+
+export type RecentSlot = {
+  parking_slot?: string;
+};
+
+export type TimeSlot = {
+  created_at?: string;
+};
